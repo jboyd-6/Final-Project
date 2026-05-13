@@ -22,7 +22,7 @@ library(tidyr)
 
 #Load in Data 
 Consumption = read.csv("/cloud/project/finalproject/use_NY.csv")
-Names = read_xlsx("/cloud/project/finalproject/Codes_and_Descriptions.xlsx", sheet = "MSN descriptions", skip = 11) #Used internet to help here and get directly to Rows for descpritions
+Names = read_xlsx("/cloud/project/finalproject/Codes_and_Descriptions.xlsx", sheet = "MSN descriptions", skip = 10) #Used internet to help here and get directly to Rows for descpritions
 
 #Cleaning Data
 names(Consumption)
@@ -503,7 +503,6 @@ ggplot() +
   theme_classic() +
   labs(x = "Year", y = "Total Energy Consumption", title = "NY Total Energy Consumption 10 Year Prediction (ETS)")
 
-
 # Total forecast with ARIMA ----
 
 #Historic values
@@ -520,7 +519,7 @@ all_hist_arima = rbind(all_hist_arima, PET)
 all_hist_arima = rbind(all_hist_arima, NUC)
 all_hist_arima = rbind(all_hist_arima, total)
 
-#Organizing and uniforming the sources
+#Organizing and uniforming the forecasting sources
 newCoalF$source = "Coal"
 newNGf$source = "Natural Gas"
 newREf$source = "Renewables"
@@ -540,7 +539,7 @@ ggplot() +
   geom_line(data = all_hist_arima, aes(x = year, y = consumption/1000000, color = source)) +
   geom_line(data = all_forecast_arima, aes(x = yearF, y = Point.Forecast/1000000, color = source), linetype = "dashed", linewidth = .4) +
   theme_classic() +
-  labs(title = "New York Energy Consumption Forecasts (ARIMA)", x = "Year", y = "Total Consumption (Per Million MMBTU)", color = "Energy Source")
+  labs(title = "New York Energy Consumption Forecasts (ARIMA)", x = "Year", y = "Total Consumption (Per Million BBTU)", color = "Energy Source")
 
 # TOTAL FORECAST with ETS ----
 
@@ -564,7 +563,7 @@ ggplot() +
   geom_line(data = all_hist_arima, aes(x = year, y = consumption/100000, color = source)) +
   geom_line(data = all_forecast_ets, aes(x = yearF, y = Point.Forecast/100000, color = source), linetype = "dashed", linewidth = .4) +
   theme_classic() +
-  labs(title = "New York Energy Consumption Forecasts (ETS)", x = "Year", y = "Total Consumption (Per Million MMBTU)", color = "Energy Source")
+  labs(title = "New York Energy Consumption Forecasts (ETS)", x = "Year", y = "Total Consumption (Per Million BBTU)", color = "Energy Source")
 
 #Renewable Energy Specific Growth ----
 
@@ -697,5 +696,56 @@ ggplot() +
   geom_line(data = all_renewable_hist, aes(x = year, y = consumption, color = source)) +
   geom_line(data = all_renewable_forecast,aes(x = yearF, y = Point.Forecast, color = source), linetype = "dashed") +
   theme_classic() +
-  labs(title = "NY Renewable Energy Source Forecasts", x = "Year", y = "Total Consumption", color = "Renewable Source")
+  labs(title = "NY Renewable Energy Source Forecasts (ETS)", x = "Year", y = "Total Consumption (Per BBTU)", color = "Renewable Source")
 
+
+#Looking at CO2 Emissions forecast ----
+
+#Cleaning Data
+
+CO2emmissions = read.csv("/cloud/project/finalproject/co2_NY.csv")
+
+CO2emmissions = CO2emmissions %>%
+  select(-Data_Status, -State) #Select just the years and not data or state
+
+names(CO2emmissions) = sub("X", "", names(CO2emmissions)) #Take X out from years
+names(CO2emmissions)
+
+CO2emmissions_long = pivot_longer(CO2emmissions,cols = -MSN, names_to = "year", values_to = "consumption") 
+CO2emmissions_long
+
+CO2emmissions_long$Description = Names$Description[match(CO2emmissions_long$MSN, Names$MSN)] 
+
+#Create Forecast for total CO2 Emmissions
+CO2 = CO2emmissions_long[CO2emmissions_long$MSN %in% c("TETCE"),]
+
+CO2$year = as.numeric(CO2$year)
+CO2$consumption = as.numeric(CO2$consumption)
+
+CO2_ts = ts(CO2$consumption, start = min(CO2$year), frequency = 1)
+
+CO2_arima = arima(CO2_ts, order = c(4,0,0))
+CO2_ETS = ets(CO2_ts)
+
+newCO2_arima = forecast(CO2_arima, h = 10)
+newCO2 = forecast(CO2_ETS, h = 10)
+
+newCO2_arimaf = data.frame(newCO2_arima)
+newCO2f = data.frame(newCO2)
+
+newCO2_arimaf$yearF = c(2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033)
+newCO2f$yearF = c(2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033)
+
+newCO2_arimaf$source = "CO2 Emmissions"
+newCO2f$source = "CO2 Emmissions"
+
+#Plotting forecast
+
+ggplot() +
+  geom_line(data = CO2, aes(x = year, y = consumption)) + 
+  xlim(min(CO2$year), newCO2f$yearF[10]) +
+  geom_line(data = newCO2_arimaf, aes(x = yearF, y = Point.Forecast, color = "ARIMA"), linetype = "dashed") +
+  geom_line(data = newCO2f, aes(x = yearF, y = Point.Forecast, color = "ETS"), linetype = "dashed") +
+  geom_ribbon(data = newCO2f, aes(x = yearF, ymin = Lo.95, ymax = Hi.95), fill = rgb(0.5, 0.5, 0.5, 0.5)) +
+  theme_classic() +
+  labs(x = "Year", y = "Total C02 Emmissions", title = "NY CO2 Emmission 10 Year Prediction (ETS)", color = "Model")
