@@ -3,7 +3,7 @@
 
 #Data Citation 
 
-# "All Consumption Estimates", 2026 Version, EIA Data, 2023, April 2026, https://www.eia.gov/state/seds/seds-data-complete.php?sid=US#Consumption
+# "All Consumption Estimates", 2025 Version, EIA Data, 2023, Accessed: April 2026, https://www.eia.gov/state/seds/seds-data-complete.php?sid=US#Consumption
 # "
 
 #Name of data set, version (if available), name/entity of data, year, date access (April 2026)
@@ -45,16 +45,15 @@ Energy_Total = consumption_long$MSN %in% c("CLTCB", "NGTCB", "PATCB", "RETCB", "
 #Total Energy Sources ----
 ggplot(consumption_long[
   consumption_long$MSN %in% c("CLTCB", "NGTCB", "PATCB", "RETCB", "NUETB", "TETCB"),],
-  aes(x = as.numeric(year), y = as.numeric(consumption), color = source)) +
+  aes(x = as.numeric(year), y = as.numeric(consumption), color = MSN)) +
   geom_line() +
   labs(title="NY Energy Consumption Source Over Time", y ="Total Consumption", x="Year", color = "Energy Source")+
-  scale_color_manual(values = c("brown", "black", "green", "blue", "orange", "purple"),
-    labels = c("All Petroleum", "Coal Total", "Natural Gas Total", "Nuclear Total", "Renewables Total", "Total Energy"))
+  scale_color_manual(values = c("brown", "black", "green", "blue", "orange", "purple"),labels = c("All Petroleum", "Coal Total", "Natural Gas Total", "Nuclear Total", "Renewables Total", "Total Energy"))
 
 #Renewable Energy Sources ----
 ggplot(consumption_long[
   consumption_long$MSN %in% c("BMTCB", "GETCB", "HYTCB", "SOTCB","WYTCB"), ],
-  aes(x = as.numeric(year), y = as.numeric(consumption), color = source)) +
+  aes(x = as.numeric(year), y = as.numeric(consumption), color = MSN)) +
   geom_line() +
   labs(title="NY Renewable Energy Counsumption Source Over Time", y ="Total Consumption (BBTU)", x="Year", color = "Energy Source")+
   scale_color_manual(values = c("blue3", "pink", "orange", "red", "purple"),
@@ -689,7 +688,7 @@ all_renewable_forecast = rbind(all_renewable_forecast, newHydrof)
 all_renewable_forecast = rbind(all_renewable_forecast, newSolarf)
 all_renewable_forecast = rbind(all_renewable_forecast, newWindf)
 
-all_renewable_hist = rbind(Bio, GE)
+all_renewable_hist = rbind(Bio, Geo)
 all_renewable_hist = rbind(all_renewable_hist, Hydro)
 all_renewable_hist = rbind(all_renewable_hist, Solar)
 all_renewable_hist = rbind(all_renewable_hist, Wind)
