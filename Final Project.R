@@ -4,7 +4,8 @@
 #Data Citation 
 
 # "All Consumption Estimates", 2025 Version, EIA Data, 2023, Accessed: April 2026, https://www.eia.gov/state/seds/seds-data-complete.php?sid=US#Consumption
-# "
+# "All CO2 emissions estimates", 2025 Version, EIA Data, 2023, Accessed: April 2026, https://www.eia.gov/state/seds/seds-data-complete.php?sid=US#Consumption
+# "Appendix A. Mnemonic series names (MSN)", 2025 Version, EIA Data, 2023, Accessed: April 2026, https://www.eia.gov/state/seds/sep_use/notes/use_a.pdf 
 
 #Name of data set, version (if available), name/entity of data, year, date access (April 2026)
 
