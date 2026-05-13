@@ -81,7 +81,7 @@ Coal_y = na.omit(Coal_ts)
 model1_Coal = arima(Coal_y,order = c(1,0,0))
 model1_Coal
 
-model4_Coal = arima(Coal_y, order = c(4,0,0))
+model4_Coal = arima(Coal_y, order = c(10,0,0))
 model4_Coal
 
 ETS_Coal = ets(Coal_ts)
@@ -152,7 +152,7 @@ NG_y = na.omit(NG_ts)
 model1_NG = arima(NG_y,order = c(1,0,0))
 model1_NG
 
-model4_NG = arima(NG_y, order = c(4,0,0))
+model4_NG = arima(NG_y, order = c(10,0,0))
 model4_NG
 
 ETS_NG = ets(NG_y)
@@ -226,7 +226,7 @@ RE_y = na.omit(RE_ts)
 model1_RE = arima(RE_y, order = c(1,0,0))
 model1_RE
 
-model4_RE = arima(RE_y, order = c(4,0,0))
+model4_RE = arima(RE_y, order = c(10,0,0))
 model4_RE
 
 RE_ETS = ets(RE_y)
@@ -300,7 +300,7 @@ PET_y = na.omit(PET_ts)
 model1_PET = arima(PET_y, order = c(1,0,0))
 model1_PET
 
-model4_PET = arima(PET_y, order = c(4,0,0))
+model4_PET = arima(PET_y, order = c(10,0,0))
 model4_PET
 
 PET_ETS = ets(PET_y)
@@ -373,7 +373,7 @@ NUC_y = na.omit(NUC_ts)
 model1_NUC = arima(NUC_y, order = c(1,0,0))
 model1_NUC
 
-model4_NUC = arima(NUC_y, order = c(4,0,0))
+model4_NUC = arima(NUC_y, order = c(10,0,0))
 model4_NUC
 
 NUC_ETS = ets(NUC_y)
@@ -447,7 +447,7 @@ total_y = na.omit(total_ts)
 model1_total = arima(total_y, order = c(1,0,0))
 model1_total
 
-model4_total = arima(total_y, order = c(4,0,0))
+model4_total = arima(total_y, order = c(10,0,0))
 model4_total
 
 ETS_total = ets(total_y)
@@ -580,7 +580,7 @@ ggplot(re_percent_df, aes(x = year, y = re_percent)) +
 #Predicting future values w arima and ets
 re_percent_ts = ts(re_percent_df$re_percent, start = min(re_percent_df$year), frequency = 1)
 
-re_arima = arima(re_percent_ts, order = c(4,0,0))
+re_arima = arima(re_percent_ts, order = c(20,0,0))
 re_future_ets = ets(re_percent_ts)
 
 new_arima = forecast(re_arima, h = 10)
@@ -597,6 +597,7 @@ ggplot() +
   geom_line(data = new_ets_re, aes(x = year, y = Point.Forecast, color = "ETS"), linetype = "dashed")+
   geom_line(data = new_arima_re, aes(x = year, y = Point.Forecast, color = "ARIMA"), linetype = "dashed")+
   geom_ribbon(data = new_ets_re, aes( x = year, ymin = Lo.95, ymax = Hi.95), fill = rgb(0.5, 0.5, 0.5, 0.5))+
+  geom_ribbon(data = new_arima_re, aes( x = year, ymin = Lo.95, ymax = Hi.95), fill = rgb(0.5, 0.5, 0.5, 0.5))+
   labs(title = "NY Renewable Energy Share Forecast",  x = "Year", y = "Share of Total Energy Consumption (%)", color = "Model")
 
 
@@ -724,7 +725,7 @@ CO2$consumption = as.numeric(CO2$consumption)
 
 CO2_ts = ts(CO2$consumption, start = min(CO2$year), frequency = 1)
 
-CO2_arima = arima(CO2_ts, order = c(4,0,0))
+CO2_arima = arima(CO2_ts, order = c(20,0,0))
 CO2_ETS = ets(CO2_ts)
 
 newCO2_arima = forecast(CO2_arima, h = 10)
@@ -747,5 +748,6 @@ ggplot() +
   geom_line(data = newCO2_arimaf, aes(x = yearF, y = Point.Forecast, color = "ARIMA"), linetype = "dashed") +
   geom_line(data = newCO2f, aes(x = yearF, y = Point.Forecast, color = "ETS"), linetype = "dashed") +
   geom_ribbon(data = newCO2f, aes(x = yearF, ymin = Lo.95, ymax = Hi.95), fill = rgb(0.5, 0.5, 0.5, 0.5)) +
+  geom_ribbon(data = newCO2_arimaf, aes(x = yearF, ymin = Lo.95, ymax = Hi.95), fill = rgb(0.5, 0.5, 0.5, 0.5)) +
   theme_classic() +
-  labs(x = "Year", y = "Total C02 Emmissions", title = "NY CO2 Emmission 10 Year Prediction (ETS)", color = "Model")
+  labs(x = "Year", y = "Total C02 Emmissions (Million Metric Tons)", title = "NY CO2 Emmission 10 Year Prediction", color = "Model")
