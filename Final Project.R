@@ -110,6 +110,7 @@ newCoal
 newCoalETS = forecast(ETS_fit_Coal, h = 10)
 newCoalETS
 
+#make dataframe for plotting
 newCoalF = data.frame(newCoal)
 newCoalETSF = data.frame(newCoalETS)
 
@@ -191,7 +192,7 @@ newNGETSf = data.frame(newNGETS)
 newNGf$yearF = c(2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033)
 newNGETSf$yearF = c(2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033)
 
-#make a plot with data and predictions including a prediction interval
+#make a plot with data and predictions including a prediction interval for ARIMA
 ggplot() +
   geom_line(data = NG, aes(x = year, y = consumption)) +
   xlim(min(NG$year), newNGf$yearF[10]) +
@@ -255,6 +256,7 @@ newRE
 
 newRE_ETS = forecast(ETS_RE, h = 10)
 newRE_ETS
+
 #make dataframe for plotting
 newREf = data.frame(newRE)
 newRE_ETSf = data.frame(newRE_ETS)
@@ -405,7 +407,6 @@ newNUC_ETS
 
 #make dataframe for plotting
 newNUCf = data.frame(newNUC)
-
 newNUC_ETSf = data.frame(newNUC_ETS)
 
 #set up future years
@@ -505,7 +506,7 @@ ggplot() +
 
 # Total forecast with ARIMA ----
 
-#Historic values
+#Simplifying source name
 Coal$source = "Coal"
 NG$source = "Natural Gas"
 RE$source = "Renewables"
@@ -513,13 +514,14 @@ PET$source = "Petroleum"
 NUC$source = "Nuclear"
 total$source = "Total Energy"
 
+#Creating historical data set, all combined together
 all_hist_arima = rbind(Coal, NG)
 all_hist_arima = rbind(all_hist_arima, RE)
 all_hist_arima = rbind(all_hist_arima, PET)
 all_hist_arima = rbind(all_hist_arima, NUC)
 all_hist_arima = rbind(all_hist_arima, total)
 
-#Organizing and uniforming the forecasting sources
+#Simplifying source name
 newCoalF$source = "Coal"
 newNGf$source = "Natural Gas"
 newREf$source = "Renewables"
@@ -527,7 +529,7 @@ newPETf$source = "Petroleum"
 newNUCf$source = "Nuclear"
 newtotalf$source = "Total Energy"
 
-#Combining all forecasted values
+#Creating forecasted data set, all combined together
 all_forecast_arima = rbind(newCoalF, newNGf)
 all_forecast_arima = rbind(all_forecast_arima, newREf)
 all_forecast_arima = rbind(all_forecast_arima, newPETf)
@@ -543,7 +545,7 @@ ggplot() +
 
 # TOTAL FORECAST with ETS ----
 
-#Organizing and uniforming the sources
+#Creating forecasted data set, all combined together
 newCoalETSF$source = "Coal"
 newNGETSf$source = "Natural Gas"
 newRE_ETSf$source = "Renewables"
@@ -600,10 +602,7 @@ ggplot() +
   geom_ribbon(data = new_arima_re, aes( x = year, ymin = Lo.95, ymax = Hi.95), fill = rgb(0.5, 0.5, 0.5, 0.5))+
   labs(title = "NY Renewable Energy Share Forecast",  x = "Year", y = "Share of Total Energy Consumption (%)", color = "Model")
 
-
 #RE Forecast by source ----
-
-#Renewable Source Forecasts ----
 
 #Biomass
 Bio = consumption_long[consumption_long$MSN %in% c("BMTCB"),]
@@ -675,24 +674,27 @@ newWindf = data.frame(newWind)
 newWindf$yearF = c(2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033)
 newWindf$source = "Wind"
 
-#Putting all into new dataframe
-
+#Simplifying source name 
 Bio$source = "Biomass"
 Geo$source = "Geothermal"
 Hydro$source = "Hydro"
 Solar$source = "Solar"
 Wind$source = "Wind"
 
+#Putting all into forecasted data frame
 all_renewable_forecast = rbind(newBiof, newGeof)
 all_renewable_forecast = rbind(all_renewable_forecast, newHydrof)
 all_renewable_forecast = rbind(all_renewable_forecast, newSolarf)
 all_renewable_forecast = rbind(all_renewable_forecast, newWindf)
 
+
+#Putting all into historic data frame
 all_renewable_hist = rbind(Bio, Geo)
 all_renewable_hist = rbind(all_renewable_hist, Hydro)
 all_renewable_hist = rbind(all_renewable_hist, Solar)
 all_renewable_hist = rbind(all_renewable_hist, Wind)
 
+#Plotting/Graphing
 ggplot() +
   geom_line(data = all_renewable_hist, aes(x = year, y = consumption, color = source)) +
   geom_line(data = all_renewable_forecast,aes(x = yearF, y = Point.Forecast, color = source), linetype = "dashed") +
@@ -717,7 +719,7 @@ CO2emmissions_long
 
 CO2emmissions_long$Description = Names$Description[match(CO2emmissions_long$MSN, Names$MSN)] 
 
-#Create Forecast for total CO2 Emmissions
+#Create Forecast for total CO2 Emissions
 CO2 = CO2emmissions_long[CO2emmissions_long$MSN %in% c("TETCE"),]
 
 CO2$year = as.numeric(CO2$year)
@@ -750,4 +752,4 @@ ggplot() +
   geom_ribbon(data = newCO2f, aes(x = yearF, ymin = Lo.95, ymax = Hi.95), fill = rgb(0.5, 0.5, 0.5, 0.5)) +
   geom_ribbon(data = newCO2_arimaf, aes(x = yearF, ymin = Lo.95, ymax = Hi.95), fill = rgb(0.5, 0.5, 0.5, 0.5)) +
   theme_classic() +
-  labs(x = "Year", y = "Total C02 Emmissions (Million Metric Tons)", title = "NY CO2 Emmission 10 Year Prediction", color = "Model")
+  labs(x = "Year", y = "Total C02 Emissions (Million Metric Tons)", title = "NY CO2 Emission 10 Year Prediction", color = "Model")
